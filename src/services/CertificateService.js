@@ -42,3 +42,4 @@ exports.generateCertificate = async (id) => {
     pdfPath
   };
 };
+

@@ -60,7 +60,7 @@ exports.getCertificate = async (id) => {
       id_batch: entry.id_batch || batch.id_batch || entry.id,
       id_kegiatan: kegiatan.id_kegiatan || batch.id_kegiatan,
       nomor_sertifikat: batch.nomor_sertifikat || '',
-      tgl_ttd: batch.tanggal_ttd || '',
+      tgl_ttd: formatDate(batch.tanggal_ttd || ''),
       template_file_url: templateUrl,
 
       tanggal: mulai
