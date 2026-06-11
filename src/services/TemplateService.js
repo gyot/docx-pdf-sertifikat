@@ -43,14 +43,20 @@ exports.fillTemplate = async (data, templatePath) => {
     logger.info(`Rendering DOCX template ${templatePath}`);
     const content = await fs.readFile(templatePath);
     const zip = new PizZip(content);
+    // const doc = new Docxtemplater(zip, {
+    //   paragraphLoop: true,
+    //   linebreaks: true,
+    //   delimiters: { start: '${', end: '}' }
+    // });
+
+    // doc.setData(data);
+    // doc.render();
     const doc = new Docxtemplater(zip, {
       paragraphLoop: true,
-      linebreaks: true,
-      delimiters: { start: '${', end: '}' }
+      linebreaks: true
     });
 
-    doc.setData(data);
-    doc.render();
+    doc.render(data);
 
     const buffer = doc.getZip().generate({ type: 'nodebuffer' });
     await fs.ensureDir(docxDir);
