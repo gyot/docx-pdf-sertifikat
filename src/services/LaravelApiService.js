@@ -89,7 +89,7 @@ exports.getCertificate = async (id) => {
         nama_instansi: item.peserta?.nama_instansi || '',
         jabatan: item.peserta?.jabatan || '',
         nip: item.peserta?.nip || '',
-        status: item.status || ''
+        peran: item.peserta?.peran || ''
       }))
     };
 
