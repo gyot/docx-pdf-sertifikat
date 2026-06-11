@@ -62,7 +62,7 @@ exports.getCertificate = async (id) => {
       nomor_sertifikat: batch.nomor_sertifikat || '',
       tgl_ttd: formatDate(batch.tanggal_ttd || ''),
       template_file_url: templateUrl,
-
+      qr_token: entry.qr_token || '',
       tanggal: mulai
         ? (
             mulai === selesai
@@ -78,6 +78,7 @@ exports.getCertificate = async (id) => {
       jabatan: peserta.jabatan || '',
       nip: peserta.nip || '',
       peran: peserta.peran || '',
+      qr_token: entry.qr_token || '',
 
       penanda_tangan: penandatangan.nama || '',
       jabatan_penandatangan: penandatangan.nama_jabatan || '',

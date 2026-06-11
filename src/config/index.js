@@ -11,6 +11,7 @@ module.exports = {
   PORT: process.env.PORT || 4000,
   LARAVEL_API_URL: LARAVEL_API_URL || '',
   LARAVEL_API_TOKEN: process.env.LARAVEL_API_TOKEN || '',
+  VERIFICATION_URL: process.env.VERIFICATION_URL || '',
   RATE_LIMIT_WINDOW_MS: 15 * 60 * 1000,
   RATE_LIMIT_MAX: 100,
   TEMP_BASE_PATH
