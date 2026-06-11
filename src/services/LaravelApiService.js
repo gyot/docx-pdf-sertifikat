@@ -73,7 +73,6 @@ exports.getCertificate = async (id) => {
 
       status: entry.status || batch.status || '',
       nama_kegiatan: kegiatan?.nama_kegiatan || '',
-      // nama_kegiatan: 'ssss',
       nama: peserta.nama_lengkap || '',
       instansi: peserta.nama_instansi || '',
       jabatan: peserta.jabatan || '',
@@ -94,12 +93,6 @@ exports.getCertificate = async (id) => {
       }))
     };
 
-  console.log('=== RESULT DOCX ===');
-  console.log(JSON.stringify(result, null, 2));
-
-  logger.info(`Certificate data received: id_batch=${result.id_batch}, peserta=${dataList.length}`);
-  return result;
-
     logger.info(`Certificate data received: id_batch=${result.id_batch}, peserta=${dataList.length}`);
     return result;
   } catch (error) {
@@ -116,3 +109,4 @@ exports.getCertificate = async (id) => {
     throw new AppError(`Failed to fetch certificate from Laravel API: ${error.message}`, 502);
   }
 };
+

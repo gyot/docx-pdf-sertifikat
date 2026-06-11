@@ -20,7 +20,11 @@ exports.generateCertificate = async (id) => {
     jabatan: String(data.jabatan || ''),
     nip: String(data.nip || ''),
     kegiatan: String(data.nama_kegiatan || ''),
-    tanggal: String(data.tanggal_ttd || '')
+    tanggal: String(data.tgl_ttd || ''),
+    peran: String(data.peran || ''),
+    penanda_tangan: String(data.penanda_tangan || ''),
+    jabatan_penandatangan: String(data.jabatan_penandatangan || ''),
+    tpk: String(data.tpk || '')
   };
   logger.info(`Template data: ${JSON.stringify(templateData)}`);
 
