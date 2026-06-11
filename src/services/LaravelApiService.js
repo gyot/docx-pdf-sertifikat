@@ -93,6 +93,12 @@ exports.getCertificate = async (id) => {
       }))
     };
 
+  console.log('=== RESULT DOCX ===');
+  console.log(JSON.stringify(result, null, 2));
+
+  logger.info(`Certificate data received: id_batch=${result.id_batch}, peserta=${dataList.length}`);
+  return result;
+
     logger.info(`Certificate data received: id_batch=${result.id_batch}, peserta=${dataList.length}`);
     return result;
   } catch (error) {
