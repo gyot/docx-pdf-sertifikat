@@ -57,7 +57,7 @@ exports.getCertificate = async (id) => {
       }))
     };
 
-    logger.info(`Certificate data received: id_batch=${result.id_batch}, peserta=${pesertaList.length}`);
+    logger.info(`Certificate data received: id_batch=${result.id_batch}, peserta=${dataList.length}`);
     return result;
   } catch (error) {
     if (error instanceof AppError) throw error;
