@@ -47,21 +47,31 @@ exports.getCertificate = async (id) => {
       } catch (_) {}
     }
 
+    const formatDate = (dateStr) => {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      if (isNaN(date)) return dateStr;
+      return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    };
     const result = {
       id_batch: entry.id_batch || batch.id_batch || entry.id,
       id_kegiatan: kegiatan.id_kegiatan || batch.id_kegiatan,
       nomor_sertifikat: batch.nomor_sertifikat || '',
       tgl_ttd: batch.tanggal_ttd || '',
       template_file_url: templateUrl,
-      tanggal: batch.tanggal_mulai==batch.tanggal_selesai ? batch.tanggal_mulai : batch.tanggal_mulai + ' - ' + batch.tanggal_selesai,
+      tanggal: 
+        formatDate(batch.kegiatan.tanggal_mulai) == formatDate(batch.kegiatan.tanggal_selesai) ? 
+          formatDate(batch.kegiatan.tanggal_mulai) : 
+            formatDate(batch.kegiatan.tanggal_mulai) + ' s.d. ' + formatDate(batch.kegiatan.tanggal_selesai),
       status: entry.status || batch.status || '',
-      nama_kegiatan: kegiatan.nama_kegiatan || '',
+      nama_kegiatan: batch.kegiatan?.nama_kegiatan || '',
       nama: peserta.nama_lengkap || '',
       instansi: peserta.nama_instansi || '',
       jabatan: peserta.jabatan || '',
       nip: peserta.nip || '',
-      penandatangan: penandatangan.nama || '',
-      jabatan_penandatangan: penandatangan.jabatan || '',
+      peran:peserta.peran || '',
+      penandatangan: batch.penandatangan?.nama || '',
+      jabatan_penandatangan: batch.penandatangan?.jabatan || '',
       tpk: kegiatan.tpk || batch.tpk || batch.kegiatan.lokasi || '',
       peserta_list: dataList.map(item => ({
         nama_lengkap: item.peserta?.nama_lengkap || '',
