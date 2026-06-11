@@ -35,12 +35,24 @@ exports.getCertificate = async (id) => {
     const kegiatan = entry.kegiatan || batch.kegiatan || {};
     const penandatangan = entry.penandatangan || batch.penandatangan || {};
 
+    let templateUrl = batch.template_file_url || '';
+    if (templateUrl && LARAVEL_API_URL) {
+      try {
+        const templateHost = new URL(templateUrl).host;
+        const apiHost = new URL(LARAVEL_API_URL).host;
+        if (templateHost !== apiHost) {
+          templateUrl = templateUrl.replace(templateHost, apiHost);
+          logger.info(`Replaced template host: ${templateHost} → ${apiHost}`);
+        }
+      } catch (_) {}
+    }
+
     const result = {
       id_batch: entry.id_batch || batch.id_batch || entry.id,
       id_kegiatan: kegiatan.id_kegiatan || batch.id_kegiatan,
       nomor_sertifikat: batch.nomor_sertifikat || '',
       tanggal_ttd: batch.tanggal_ttd || '',
-      template_file_url: batch.template_file_url || '',
+      template_file_url: templateUrl,
       status: entry.status || batch.status || '',
       nama_kegiatan: kegiatan.nama_kegiatan || '',
       nama: peserta.nama_lengkap || '',
