@@ -22,30 +22,39 @@ exports.getCertificate = async (id) => {
     const response = await apiClient.get(`/api/v1/sertifikat/${id}`);
 
     let raw = response.data;
-    let certificateData = raw?.data || raw;
+    let dataList = Array.isArray(raw?.data) ? raw.data : (raw?.data ? [raw.data] : []);
 
-    if (!certificateData || (!certificateData.id_batch && !certificateData.id)) {
+    if (dataList.length === 0) {
       logger.error(`Unexpected Laravel API response format: ${JSON.stringify(raw).substring(0, 500)}`);
       throw new AppError('Certificate not found', 404);
     }
 
-    const pesertaList = Array.isArray(certificateData.peserta) ? certificateData.peserta : [];
-    const firstPeserta = pesertaList[0]?.peserta || {};
+    const entry = dataList[0];
+    const batch = entry.batch || {};
+    const peserta = entry.peserta || {};
+    const kegiatan = entry.kegiatan || batch.kegiatan || {};
+    const penandatangan = entry.penandatangan || batch.penandatangan || {};
 
     const result = {
-      id_batch: certificateData.id_batch || certificateData.id,
-      id_kegiatan: certificateData.id_kegiatan,
-      nomor_sertifikat: certificateData.nomor_sertifikat || '',
-      tanggal_ttd: certificateData.tanggal_ttd || '',
-      template_file_url: certificateData.template_file_url || '',
-      status: certificateData.status || '',
-      nama_kegiatan: certificateData.kegiatan?.nama_kegiatan || '',
-      nama: firstPeserta.nama_lengkap || '',
-      instansi: firstPeserta.nama_instansi || '',
-      jabatan: firstPeserta.jabatan || '',
-      nip: firstPeserta.nip || '',
-      penandatangan: certificateData.penandatangan?.nama || '',
-      peserta_list: pesertaList
+      id_batch: entry.id_batch || batch.id_batch || entry.id,
+      id_kegiatan: kegiatan.id_kegiatan || batch.id_kegiatan,
+      nomor_sertifikat: batch.nomor_sertifikat || '',
+      tanggal_ttd: batch.tanggal_ttd || '',
+      template_file_url: batch.template_file_url || '',
+      status: entry.status || batch.status || '',
+      nama_kegiatan: kegiatan.nama_kegiatan || '',
+      nama: peserta.nama_lengkap || '',
+      instansi: peserta.nama_instansi || '',
+      jabatan: peserta.jabatan || '',
+      nip: peserta.nip || '',
+      penandatangan: penandatangan.nama || '',
+      peserta_list: dataList.map(item => ({
+        nama_lengkap: item.peserta?.nama_lengkap || '',
+        nama_instansi: item.peserta?.nama_instansi || '',
+        jabatan: item.peserta?.jabatan || '',
+        nip: item.peserta?.nip || '',
+        status: item.status || ''
+      }))
     };
 
     logger.info(`Certificate data received: id_batch=${result.id_batch}, peserta=${pesertaList.length}`);
