@@ -81,6 +81,7 @@ exports.getCertificate = async (id) => {
 
       penanda_tangan: penandatangan.nama || '',
       jabatan_penandatangan: penandatangan.nama_jabatan || '',
+      penanda_tangan_nip: penandatangan.nip || '',
 
       tpk: kegiatan.lokasi || batch.tpk || batch.kegiatan?.lokasi || '',
 
