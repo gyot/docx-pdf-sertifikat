@@ -13,18 +13,18 @@ exports.generateCertificate = async (id) => {
 
   const templatePath = await TemplateService.downloadTemplate(data.template_file_url);
 
-  const filledDocxPath = await TemplateService.fillTemplate(
-    {
-      nomor_sertifikat: data.nomor_sertifikat,
-      nama: data.nama,
-      instansi: data.instansi,
-      jabatan: data.jabatan,
-      nip: data.nip,
-      kegiatan: data.nama_kegiatan,
-      tanggal: data.tanggal_ttd
-    },
-    templatePath
-  );
+  const templateData = {
+    nomor_sertifikat: String(data.nomor_sertifikat || ''),
+    nama: String(data.nama || ''),
+    instansi: String(data.instansi || ''),
+    jabatan: String(data.jabatan || ''),
+    nip: String(data.nip || ''),
+    kegiatan: String(data.nama_kegiatan || ''),
+    tanggal: String(data.tanggal_ttd || '')
+  };
+  logger.info(`Template data: ${JSON.stringify(templateData)}`);
+
+  const filledDocxPath = await TemplateService.fillTemplate(templateData, templatePath);
 
   const pdfPath = await PdfConverterService.convertDocxToPdf(filledDocxPath);
 

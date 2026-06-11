@@ -72,8 +72,8 @@ exports.getCertificate = async (id) => {
         : '',
 
       status: entry.status || batch.status || '',
-      // nama_kegiatan: kegiatan?.nama_kegiatan || '',
-      nama_kegiatan: 'ssss',
+      nama_kegiatan: kegiatan?.nama_kegiatan || '',
+      // nama_kegiatan: 'ssss',
       nama: peserta.nama_lengkap || '',
       instansi: peserta.nama_instansi || '',
       jabatan: peserta.jabatan || '',
