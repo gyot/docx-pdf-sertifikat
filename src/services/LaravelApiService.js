@@ -79,10 +79,10 @@ exports.getCertificate = async (id) => {
       nip: peserta.nip || '',
       peran: peserta.peran || '',
 
-      penanda_tangan: batch.penandatangan?.nama || '',
-      jabatan_penandatangan: batch.penandatangan?.nama_jabatan || '',
+      penanda_tangan: penandatangan.nama || '',
+      jabatan_penandatangan: penandatangan.nama_jabatan || '',
 
-      tpk: kegiatan.tpk || batch.tpk || batch.kegiatan?.lokasi || '',
+      tpk: kegiatan.lokasi || batch.tpk || batch.kegiatan?.lokasi || '',
 
       peserta_list: dataList.map(item => ({
         nama_lengkap: item.peserta?.nama_lengkap || '',
