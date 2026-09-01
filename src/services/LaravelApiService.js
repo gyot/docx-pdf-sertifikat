@@ -61,9 +61,17 @@ exports.getCertificate = async (id) => {
       id_kegiatan: kegiatan.id_kegiatan || batch.id_kegiatan,
       nomor_sertifikat: batch.nomor_sertifikat || '',
       tgl_ttd: formatDate(batch.tanggal_ttd || ''),
+      tanggal_tanda_tangan: formatDate(batch.tanggal_ttd || ''),
       template_file_url: templateUrl,
       qr_token: entry.qr_token || '',
       tanggal: mulai
+        ? (
+            mulai === selesai
+              ? formatDate(mulai)
+              : `${formatDate(mulai)} s.d. ${formatDate(selesai)}`
+          )
+        : '',
+      tanggal_kegiatan: mulai
         ? (
             mulai === selesai
               ? formatDate(mulai)
@@ -78,12 +86,12 @@ exports.getCertificate = async (id) => {
       jabatan: peserta.jabatan || '',
       nip: peserta.nip || '',
       peran: peserta.peran || '',
-      qr_token: entry.qr_token || '',
 
       penanda_tangan: penandatangan.nama || '',
       jabatan_penandatangan: penandatangan.nama_jabatan || '',
       penanda_tangan_nip: penandatangan.nip || '',
 
+      lokasi: kegiatan.lokasi || batch.lokasi || batch.kegiatan?.lokasi || '',
       tpk: kegiatan.lokasi || batch.tpk || batch.kegiatan?.lokasi || '',
 
       peserta_list: dataList.map(item => ({

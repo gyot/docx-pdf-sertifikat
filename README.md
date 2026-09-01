@@ -74,6 +74,7 @@ Salin `.env.example` ke `.env` dan sesuaikan:
 PORT=4000
 LARAVEL_API_URL=https://api-siamin.bpmpntb.id/
 LARAVEL_API_TOKEN=your_token_here
+VERIFICATION_URL=https://api-siamin.bpmpntb.id/verify
 NODE_ENV=production
 ```
 
@@ -82,6 +83,7 @@ NODE_ENV=production
 | `PORT` | Tidak | `4000` | Port server Express |
 | `LARAVEL_API_URL` | **Ya** | - | Base URL API Laravel |
 | `LARAVEL_API_TOKEN` | Tidak | - | Bearer token untuk autentikasi ke Laravel API |
+| `VERIFICATION_URL` | Tidak | - | Base URL untuk QR code verifikasi sertifikat |
 | `NODE_ENV` | Tidak | `development` | `development` untuk stack trace di error response |
 
 ## Instalasi
@@ -258,13 +260,18 @@ Field yang diambil microservice:
 |-------|--------|-----------------|
 | `batch.template_file_url` | batch | Download template DOCX |
 | `batch.nomor_sertifikat` | batch | Placeholder `${nomor_sertifikat}` |
-| `batch.tanggal_ttd` | batch | Placeholder `${tanggal}` |
+| `batch.tanggal_ttd` | batch | Placeholder `${tanggal_tanda_tangan}` |
 | `peserta.nama_lengkap` | peserta | Placeholder `${nama}` |
 | `peserta.nama_instansi` | peserta | Placeholder `${instansi}` |
 | `peserta.jabatan` | peserta | Placeholder `${jabatan}` |
 | `peserta.nip` | peserta | Placeholder `${nip}` |
+| `peserta.peran` | peserta | Placeholder `${peran}` |
 | `kegiatan.nama_kegiatan` | kegiatan | Placeholder `${kegiatan}` |
-| `penandatangan.nama` | penandatangan | Logging |
+| `kegiatan.tanggal_mulai` + `tanggal_selesai` | kegiatan | Placeholder `${tanggal_kegiatan}` |
+| `kegiatan.lokasi` | kegiatan | Placeholder `${lokasi}` |
+| `penandatangan.nama` | penandatangan | Placeholder `${penanda_tangan}` |
+| `penandatangan.nama_jabatan` | penandatangan | Placeholder `${jabatan_penandatangan}` |
+| `penandatangan.nip` | penandatangan | Placeholder `${penanda_tangan_nip}` |
 
 ### Format Template DOCX
 
@@ -278,7 +285,23 @@ Template DOCX menggunakan [docxtemplater](https://docxtemplater.com/) dengan del
 | `${jabatan}` | Jabatan peserta |
 | `${nip}` | NIP peserta |
 | `${kegiatan}` | Nama kegiatan |
-| `${tanggal}` | Tanggal tanda tangan |
+| `${tanggal_kegiatan}` | Tanggal kegiatan (mulai s.d. selesai) |
+| `${tanggal_tanda_tangan}` | Tanggal tanda tangan |
+| `${lokasi}` | Lokasi kegiatan |
+| `${peran}` | Peran peserta |
+| `${penanda_tangan}` | Nama penanda tangan |
+| `${jabatan_penandatangan}` | Jabatan penanda tangan |
+| `${penanda_tangan_nip}` | NIP penanda tangan |
+| `${tpk}` | TPK/lokasi (legacy) |
+| `__QR_CODE__` | QR code verifikasi (ganti teks ini dengan gambar QR) |
+
+**Catatan QR Code:**
+
+- Placeholder `__QR_CODE__` menggunakan delimiter berbeda (tanpa `${}`) karena diproses secara terpisah oleh fungsi `injectQrCode()`.
+- Tulis teks `__QR_CODE__` di template DOCX, teks tersebut akan diganti otomatis dengan gambar QR code.
+- QR code berisi URL verifikasi: `{VERIFICATION_URL}/{qr_token}`.
+- Pastikan environment variable `VERIFICATION_URL` diisi agar QR code mengarah ke halaman verifikasi yang benar.
+- Ukuran QR code: 300x300px dengan error correction level M.
 
 ---
 
