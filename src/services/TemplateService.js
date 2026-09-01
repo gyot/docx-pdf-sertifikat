@@ -110,29 +110,24 @@ function injectQrCode(docxBuffer, qrPngBuffer) {
   const placeholder = '__QR_CODE__';
   logger.info(`[QR] Searching for placeholder "${placeholder}" in document.xml (${docXml.length} chars)`);
 
-  if (docXml.includes(placeholder)) {
-    const count = (docXml.match(new RegExp(placeholder, 'g')) || []).length;
-    logger.info(`[QR] Direct match found (${count} occurrence(s)), replacing with drawing XML...`);
-    docXml = docXml.replace(new RegExp(placeholder, 'g'), drawingXml);
-    zip.file('word/document.xml', docXml);
-    logger.info('[QR] SUCCESS: QR code image injected into DOCX (direct match)');
-  } else {
-    logger.warn(`[QR] Direct match NOT found, trying split-run regex...`);
-    const escapedChars = placeholder.split('').map(c =>
-      c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    );
-    const splitPattern = escapedChars.join('(?:<[^>]*>)*');
-    const splitRegex = new RegExp(splitPattern, 'g');
+  const runRegex = /<w:r\b[^>]*>(?:[\s\S](?!<\/w:r>))*?<\/w:r>/g;
+  let runMatch;
+  let replacedCount = 0;
 
-    if (splitRegex.test(docXml)) {
-      logger.info('[QR] Split-run match found, replacing...');
-      docXml = docXml.replace(splitRegex, drawingXml);
-      zip.file('word/document.xml', docXml);
-      logger.info('[QR] SUCCESS: QR code image injected into DOCX (split-run match)');
-    } else {
-      logger.error(`[QR] FAILED: Placeholder "${placeholder}" NOT found in document.xml`);
-      logger.warn('[QR] The template DOCX must contain "{kode_qr}" text');
+  while ((runMatch = runRegex.exec(docXml)) !== null) {
+    if (runMatch[0].includes(placeholder)) {
+      docXml = docXml.substring(0, runMatch.index) + drawingXml + docXml.substring(runMatch.index + runMatch[0].length);
+      replacedCount++;
+      runRegex.lastIndex = runMatch.index + drawingXml.length;
     }
+  }
+
+  if (replacedCount > 0) {
+    zip.file('word/document.xml', docXml);
+    logger.info(`[QR] SUCCESS: Replaced ${replacedCount} <w:r> element(s) containing placeholder with QR drawing`);
+  } else {
+    logger.error(`[QR] FAILED: No <w:r> element containing "${placeholder}" found in document.xml`);
+    logger.warn('[QR] The template DOCX must contain "{kode_qr}" text');
   }
 
   return zip.generate({ type: 'nodebuffer' });
