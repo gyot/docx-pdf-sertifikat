@@ -100,12 +100,25 @@ function injectQrCode(docxBuffer, qrPngBuffer) {
   ].join('');
 
   const placeholder = '__QR_CODE__';
+
   if (docXml.includes(placeholder)) {
     docXml = docXml.replace(new RegExp(placeholder, 'g'), drawingXml);
     zip.file('word/document.xml', docXml);
-    logger.info('QR code image injected into DOCX');
+    logger.info('QR code image injected into DOCX (direct match)');
   } else {
-    logger.warn(`Placeholder "${placeholder}" not found in document.xml`);
+    const escapedChars = placeholder.split('').map(c =>
+      c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    );
+    const splitPattern = escapedChars.join('(?:<[^>]*>)*');
+    const splitRegex = new RegExp(splitPattern, 'g');
+
+    if (splitRegex.test(docXml)) {
+      docXml = docXml.replace(splitRegex, drawingXml);
+      zip.file('word/document.xml', docXml);
+      logger.info('QR code image injected into DOCX (split run match)');
+    } else {
+      logger.warn(`Placeholder "${placeholder}" not found in document.xml`);
+    }
   }
 
   return zip.generate({ type: 'nodebuffer' });

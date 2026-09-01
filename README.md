@@ -74,7 +74,6 @@ Salin `.env.example` ke `.env` dan sesuaikan:
 PORT=4000
 LARAVEL_API_URL=https://api-siamin.bpmpntb.id/
 LARAVEL_API_TOKEN=your_token_here
-VERIFICATION_URL=https://api-siamin.bpmpntb.id/verify
 NODE_ENV=production
 ```
 
@@ -83,7 +82,6 @@ NODE_ENV=production
 | `PORT` | Tidak | `4000` | Port server Express |
 | `LARAVEL_API_URL` | **Ya** | - | Base URL API Laravel |
 | `LARAVEL_API_TOKEN` | Tidak | - | Bearer token untuk autentikasi ke Laravel API |
-| `VERIFICATION_URL` | Tidak | - | Base URL untuk QR code verifikasi sertifikat |
 | `NODE_ENV` | Tidak | `development` | `development` untuk stack trace di error response |
 
 ## Instalasi
@@ -293,15 +291,9 @@ Template DOCX menggunakan [docxtemplater](https://docxtemplater.com/) dengan del
 | `${jabatan_penandatangan}` | Jabatan penanda tangan |
 | `${penanda_tangan_nip}` | NIP penanda tangan |
 | `${tpk}` | TPK/lokasi (legacy) |
-| `__QR_CODE__` | QR code verifikasi (ganti teks ini dengan gambar QR) |
+| `${kode_qr}` | QR code verifikasi |
 
-**Catatan QR Code:**
-
-- Placeholder `__QR_CODE__` menggunakan delimiter berbeda (tanpa `${}`) karena diproses secara terpisah oleh fungsi `injectQrCode()`.
-- Tulis teks `__QR_CODE__` di template DOCX, teks tersebut akan diganti otomatis dengan gambar QR code.
-- QR code berisi URL verifikasi: `{VERIFICATION_URL}/{qr_token}`.
-- Pastikan environment variable `VERIFICATION_URL` diisi agar QR code mengarah ke halaman verifikasi yang benar.
-- Ukuran QR code: 300x300px dengan error correction level M.
+**Catatan QR Code:** Tulis `{kode_qr}` di template DOCX pada posisi yang diinginkan. Saat generate, placeholder akan diganti gambar QR code berisi URL verifikasi. Pastikan `VERIFICATION_URL` di `.env` sudah diisi.
 
 ---
 
