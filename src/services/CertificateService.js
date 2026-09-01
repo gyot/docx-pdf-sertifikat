@@ -15,21 +15,27 @@ exports.generateCertificate = async (id) => {
 
   const templatePath = await TemplateService.downloadTemplate(data.template_file_url);
 
+  logger.info(`[QR] qr_token: ${data.qr_token || 'EMPTY'}`);
+  logger.info(`[QR] VERIFICATION_URL: ${VERIFICATION_URL || 'NOT SET'}`);
+
   let qrPngBuffer = null;
   if (data.qr_token) {
     try {
       const qrContent = VERIFICATION_URL
         ? `${VERIFICATION_URL}/${data.qr_token}`
         : data.qr_token;
+      logger.info(`[QR] QR content to encode: ${qrContent}`);
       qrPngBuffer = await QRCode.toBuffer(qrContent, {
         width: 300,
         margin: 2,
         errorCorrectionLevel: 'M'
       });
-      logger.info(`QR code generated for token: ${data.qr_token}`);
+      logger.info(`[QR] QR PNG buffer generated: ${qrPngBuffer.length} bytes`);
     } catch (err) {
-      logger.error(`QR code generation failed: ${err.message}`);
+      logger.error(`[QR] QR code generation FAILED: ${err.message}`);
     }
+  } else {
+    logger.warn('[QR] No qr_token found, QR code will NOT be generated');
   }
 
   const templateData = {

@@ -39,9 +39,11 @@ exports.downloadTemplate = async (url) => {
 };
 
 function injectQrCode(docxBuffer, qrPngBuffer) {
+  logger.info(`[QR] Starting injectQrCode - buffer: ${qrPngBuffer.length} bytes`);
   const zip = new PizZip(docxBuffer);
 
   zip.file('word/media/qrcode.png', qrPngBuffer);
+  logger.info('[QR] Added qrcode.png to word/media/');
 
   const contentTypesFile = zip.file('[Content_Types].xml');
   if (contentTypesFile) {
@@ -49,6 +51,9 @@ function injectQrCode(docxBuffer, qrPngBuffer) {
     if (!ct.includes('Extension="png"')) {
       ct = ct.replace('</Types>', '<Default Extension="png" ContentType="image/png"/></Types>');
       zip.file('[Content_Types].xml', ct);
+      logger.info('[QR] Updated [Content_Types].xml with PNG extension');
+    } else {
+      logger.info('[QR] [Content_Types].xml already has PNG extension');
     }
   }
 
@@ -61,6 +66,9 @@ function injectQrCode(docxBuffer, qrPngBuffer) {
         '<Relationship Id="rIdQR" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/qrcode.png"/></Relationships>'
       );
       zip.file('word/_rels/document.xml.rels', rels);
+      logger.info('[QR] Added rIdQR relationship to document.xml.rels');
+    } else {
+      logger.info('[QR] rIdQR relationship already exists');
     }
   }
 
@@ -100,12 +108,16 @@ function injectQrCode(docxBuffer, qrPngBuffer) {
   ].join('');
 
   const placeholder = '__QR_CODE__';
+  logger.info(`[QR] Searching for placeholder "${placeholder}" in document.xml (${docXml.length} chars)`);
 
   if (docXml.includes(placeholder)) {
+    const count = (docXml.match(new RegExp(placeholder, 'g')) || []).length;
+    logger.info(`[QR] Direct match found (${count} occurrence(s)), replacing with drawing XML...`);
     docXml = docXml.replace(new RegExp(placeholder, 'g'), drawingXml);
     zip.file('word/document.xml', docXml);
-    logger.info('QR code image injected into DOCX (direct match)');
+    logger.info('[QR] SUCCESS: QR code image injected into DOCX (direct match)');
   } else {
+    logger.warn(`[QR] Direct match NOT found, trying split-run regex...`);
     const escapedChars = placeholder.split('').map(c =>
       c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     );
@@ -113,11 +125,13 @@ function injectQrCode(docxBuffer, qrPngBuffer) {
     const splitRegex = new RegExp(splitPattern, 'g');
 
     if (splitRegex.test(docXml)) {
+      logger.info('[QR] Split-run match found, replacing...');
       docXml = docXml.replace(splitRegex, drawingXml);
       zip.file('word/document.xml', docXml);
-      logger.info('QR code image injected into DOCX (split run match)');
+      logger.info('[QR] SUCCESS: QR code image injected into DOCX (split-run match)');
     } else {
-      logger.warn(`Placeholder "${placeholder}" not found in document.xml`);
+      logger.error(`[QR] FAILED: Placeholder "${placeholder}" NOT found in document.xml`);
+      logger.warn('[QR] The template DOCX must contain "{kode_qr}" text');
     }
   }
 
@@ -139,8 +153,11 @@ exports.fillTemplate = async (data, templatePath, qrPngBuffer = null) => {
 
     let buffer = doc.getZip().generate({ type: 'nodebuffer' });
 
+    logger.info(`[QR] qrPngBuffer in fillTemplate: ${qrPngBuffer ? `${qrPngBuffer.length} bytes` : 'NULL - QR will be SKIPPED'}`);
     if (qrPngBuffer) {
       buffer = injectQrCode(buffer, qrPngBuffer);
+    } else {
+      logger.warn('[QR] Skipping QR injection - no buffer');
     }
 
     await fs.ensureDir(docxDir);
