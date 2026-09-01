@@ -110,23 +110,44 @@ function injectQrCode(docxBuffer, qrPngBuffer) {
   const placeholder = '__QR_CODE__';
   logger.info(`[QR] Searching for placeholder "${placeholder}" in document.xml (${docXml.length} chars)`);
 
-  const runRegex = /<w:r\b[^>]*>(?:[\s\S](?!<\/w:r>))*?<\/w:r>/g;
-  let runMatch;
   let replacedCount = 0;
+  let searchFrom = 0;
 
-  while ((runMatch = runRegex.exec(docXml)) !== null) {
-    if (runMatch[0].includes(placeholder)) {
-      docXml = docXml.substring(0, runMatch.index) + drawingXml + docXml.substring(runMatch.index + runMatch[0].length);
-      replacedCount++;
-      runRegex.lastIndex = runMatch.index + drawingXml.length;
+  while (true) {
+    const tIdx = docXml.indexOf('<w:t', searchFrom);
+    if (tIdx === -1) break;
+
+    const tagClose = docXml.indexOf('>', tIdx);
+    if (tagClose === -1) break;
+
+    const textEnd = docXml.indexOf('</w:t>', tagClose);
+    if (textEnd === -1) break;
+
+    const textContent = docXml.substring(tagClose + 1, textEnd).trim();
+
+    if (textContent === placeholder) {
+      const rOpen = docXml.lastIndexOf('<w:r>', tIdx);
+      const rClose = docXml.indexOf('</w:r>', textEnd);
+
+      if (rOpen !== -1 && rClose !== -1 && rOpen < tIdx && rClose > textEnd) {
+        const oldLen = docXml.length;
+        docXml = docXml.substring(0, rOpen) + drawingXml + docXml.substring(rClose + 6);
+        replacedCount++;
+        searchFrom = rOpen + drawingXml.length;
+        logger.info(`[QR] Replaced <w:r> at offset ${rOpen} (${rClose - rOpen + 6} bytes)`);
+      } else {
+        searchFrom = textEnd + 6;
+      }
+    } else {
+      searchFrom = textEnd + 6;
     }
   }
 
   if (replacedCount > 0) {
     zip.file('word/document.xml', docXml);
-    logger.info(`[QR] SUCCESS: Replaced ${replacedCount} <w:r> element(s) containing placeholder with QR drawing`);
+    logger.info(`[QR] SUCCESS: Replaced ${replacedCount} placeholder(s) with QR drawing`);
   } else {
-    logger.error(`[QR] FAILED: No <w:r> element containing "${placeholder}" found in document.xml`);
+    logger.error(`[QR] FAILED: Placeholder "${placeholder}" NOT found in any <w:t> element`);
     logger.warn('[QR] The template DOCX must contain "{kode_qr}" text');
   }
 
