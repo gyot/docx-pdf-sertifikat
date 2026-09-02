@@ -245,7 +245,18 @@ Microservice memanggil `GET {LARAVEL_API_URL}/api/v1/sertifikat/{id}` dan mengha
         "nama_lengkap": "Huryati, S.Pd",
         "nama_instansi": "PAUD Al Jihan",
         "jabatan": null,
-        "nip": null
+        "nip": null,
+        "kab_kota": "Kabupaten Lombok Barat",
+        "tpk": {
+          "id_tpk": 104,
+          "lokasi": "Aula Anggrek BPMP NTB",
+          "kabupaten_kota": "Kota Mataram"
+        }
+      },
+      "lokasi": {
+        "id_tpk": 104,
+        "lokasi": "Aula Anggrek BPMP NTB",
+        "kabupaten_kota": "Kota Mataram"
       }
     }
   ]
@@ -266,7 +277,8 @@ Field yang diambil microservice:
 | `peserta.peran` | peserta | Placeholder `${peran}` |
 | `kegiatan.nama_kegiatan` | kegiatan | Placeholder `${kegiatan}` |
 | `kegiatan.tanggal_mulai` + `tanggal_selesai` | kegiatan | Placeholder `${tanggal_kegiatan}` |
-| `kegiatan.lokasi` | kegiatan | Placeholder `${lokasi}` |
+| `lokasi.lokasi` | lokasi | Placeholder `${lokasi}` dan `${tpk}` |
+| `lokasi.kabupaten_kota` | lokasi | Placeholder `${kabupaten_kota}` |
 | `penandatangan.nama` | penandatangan | Placeholder `${penanda_tangan}` |
 | `penandatangan.nama_jabatan` | penandatangan | Placeholder `${jabatan_penandatangan}` |
 | `penandatangan.nip` | penandatangan | Placeholder `${penanda_tangan_nip}` |
@@ -285,13 +297,16 @@ Template DOCX menggunakan [docxtemplater](https://docxtemplater.com/) dengan del
 | `${kegiatan}` | Nama kegiatan |
 | `${tanggal_kegiatan}` | Tanggal kegiatan (mulai s.d. selesai) |
 | `${tanggal_tanda_tangan}` | Tanggal tanda tangan |
-| `${lokasi}` | Lokasi kegiatan |
+| `${lokasi}` | Lokasi TPK, contoh: `Aula Anggrek BPMP NTB` |
+| `${tpk}` | Lokasi TPK, nilainya sama dengan `${lokasi}` |
+| `${kabupaten_kota}` | Kabupaten/kota lokasi TPK, contoh: `Kota Mataram` |
 | `${peran}` | Peran peserta |
 | `${penanda_tangan}` | Nama penanda tangan |
 | `${jabatan_penandatangan}` | Jabatan penanda tangan |
 | `${penanda_tangan_nip}` | NIP penanda tangan |
-| `${tpk}` | TPK/lokasi (legacy) |
 | `${kode_qr}` | QR code verifikasi |
+
+Data lokasi diprioritaskan dari objek `lokasi` pada data sertifikat. Jika objek tersebut tidak tersedia, microservice menggunakan `peserta.tpk`; khusus kabupaten/kota, fallback terakhir menggunakan `peserta.kab_kota`.
 
 **Catatan QR Code:** Tulis `{kode_qr}` di template DOCX pada posisi yang diinginkan. Saat generate, placeholder akan diganti gambar QR code berisi URL verifikasi. Pastikan `VERIFICATION_URL` di `.env` sudah diisi.
 

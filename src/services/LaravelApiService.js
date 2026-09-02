@@ -34,6 +34,7 @@ exports.getCertificate = async (id) => {
     const peserta = entry.peserta || {};
     const kegiatan = entry.kegiatan || batch.kegiatan || {};
     const penandatangan = entry.penandatangan || batch.penandatangan || {};
+    const lokasi = entry.lokasi || peserta.tpk || {};
 
     let templateUrl = batch.template_file_url || '';
     if (templateUrl && LARAVEL_API_URL) {
@@ -91,8 +92,9 @@ exports.getCertificate = async (id) => {
       jabatan_penandatangan: penandatangan.nama_jabatan || '',
       penanda_tangan_nip: penandatangan.nip || '',
 
-      lokasi: kegiatan.lokasi || batch.lokasi || batch.kegiatan?.lokasi || '',
-      tpk: kegiatan.lokasi || batch.tpk || batch.kegiatan?.lokasi || '',
+      lokasi: lokasi.lokasi || kegiatan.lokasi || batch.lokasi || batch.kegiatan?.lokasi || '',
+      tpk: lokasi.lokasi || kegiatan.lokasi || batch.tpk || batch.kegiatan?.lokasi || '',
+      kabupaten_kota: lokasi.kabupaten_kota || peserta.kab_kota || '',
 
       peserta_list: dataList.map(item => ({
         nama_lengkap: item.peserta?.nama_lengkap || '',

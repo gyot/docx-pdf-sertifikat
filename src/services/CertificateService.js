@@ -55,6 +55,7 @@ exports.generateCertificate = async (id) => {
     penanda_tangan: String(data.penanda_tangan || ''),
     jabatan_penandatangan: String(data.jabatan_penandatangan || ''),
     tpk: String(data.tpk || ''),
+    kabupaten_kota: String(data.kabupaten_kota || ''),
     penanda_tangan_nip: String(data.penanda_tangan_nip || '')
   };
   logger.info(`Template data: ${JSON.stringify(templateData)}`);
