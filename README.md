@@ -257,7 +257,14 @@ Microservice memanggil `GET {LARAVEL_API_URL}/api/v1/sertifikat/{id}` dan mengha
         "id_tpk": 104,
         "lokasi": "Aula Anggrek BPMP NTB",
         "kabupaten_kota": "Kota Mataram"
-      }
+      },
+      "kelas": [
+        {
+          "id_kelas": 1,
+          "nama_kelas": "Digitalisasi Pembelajaran",
+          "deskripsi": null
+        }
+      ]
     }
   ]
 }
@@ -279,6 +286,7 @@ Field yang diambil microservice:
 | `kegiatan.tanggal_mulai` + `tanggal_selesai` | kegiatan | Placeholder `${tanggal_kegiatan}` |
 | `lokasi.lokasi` | lokasi | Placeholder `${lokasi}` dan `${tpk}` |
 | `lokasi.kabupaten_kota` | lokasi | Placeholder `${kabupaten_kota}` |
+| `kelas[].nama_kelas` | kelas | Placeholder `${kelas}` |
 | `penandatangan.nama` | penandatangan | Placeholder `${penanda_tangan}` |
 | `penandatangan.nama_jabatan` | penandatangan | Placeholder `${jabatan_penandatangan}` |
 | `penandatangan.nip` | penandatangan | Placeholder `${penanda_tangan_nip}` |
@@ -300,6 +308,7 @@ Template DOCX menggunakan [docxtemplater](https://docxtemplater.com/) dengan del
 | `${lokasi}` | Lokasi TPK, contoh: `Aula Anggrek BPMP NTB` |
 | `${tpk}` | Lokasi TPK, nilainya sama dengan `${lokasi}` |
 | `${kabupaten_kota}` | Kabupaten/kota lokasi TPK, contoh: `Kota Mataram` |
+| `${kelas}` | Nama kelas peserta; beberapa kelas dipisahkan dengan koma |
 | `${peran}` | Peran peserta |
 | `${penanda_tangan}` | Nama penanda tangan |
 | `${jabatan_penandatangan}` | Jabatan penanda tangan |
@@ -307,6 +316,8 @@ Template DOCX menggunakan [docxtemplater](https://docxtemplater.com/) dengan del
 | `${kode_qr}` | QR code verifikasi |
 
 Data lokasi diprioritaskan dari objek `lokasi` pada data sertifikat. Jika objek tersebut tidak tersedia, microservice menggunakan `peserta.tpk`; khusus kabupaten/kota, fallback terakhir menggunakan `peserta.kab_kota`.
+
+Data kelas diprioritaskan dari array `kelas` pada data sertifikat, dengan fallback ke `peserta.kelas`. Jika peserta memiliki beberapa kelas, seluruh `nama_kelas` digabungkan menggunakan koma.
 
 **Catatan QR Code:** Tulis `{kode_qr}` di template DOCX pada posisi yang diinginkan. Saat generate, placeholder akan diganti gambar QR code berisi URL verifikasi. Pastikan `VERIFICATION_URL` di `.env` sudah diisi.
 

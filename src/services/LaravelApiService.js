@@ -35,6 +35,9 @@ exports.getCertificate = async (id) => {
     const kegiatan = entry.kegiatan || batch.kegiatan || {};
     const penandatangan = entry.penandatangan || batch.penandatangan || {};
     const lokasi = entry.lokasi || peserta.tpk || {};
+    const kelas = Array.isArray(entry.kelas) && entry.kelas.length > 0
+      ? entry.kelas
+      : (Array.isArray(peserta.kelas) ? peserta.kelas : []);
 
     let templateUrl = batch.template_file_url || '';
     if (templateUrl && LARAVEL_API_URL) {
@@ -87,6 +90,7 @@ exports.getCertificate = async (id) => {
       jabatan: peserta.jabatan || '',
       nip: peserta.nip || '',
       peran: peserta.peran || '',
+      kelas: kelas.map(item => item?.nama_kelas).filter(Boolean).join(', '),
 
       penanda_tangan: penandatangan.nama || '',
       jabatan_penandatangan: penandatangan.nama_jabatan || '',

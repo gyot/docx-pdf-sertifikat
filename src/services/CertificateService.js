@@ -52,6 +52,7 @@ exports.generateCertificate = async (id) => {
     tanggal_kegiatan: String(data.tanggal_kegiatan || data.tanggal || ''),
     lokasi: String(data.lokasi || ''),
     peran: String(data.peran || ''),
+    kelas: String(data.kelas || ''),
     penanda_tangan: String(data.penanda_tangan || ''),
     jabatan_penandatangan: String(data.jabatan_penandatangan || ''),
     tpk: String(data.tpk || ''),
